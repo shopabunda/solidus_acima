@@ -1,0 +1,5 @@
+bump:
+  recurse: false
+  file: 'lib/solidus_acima/version.rb'
+  message: Bump SolidusAcima to %{version}
+  tag: true
