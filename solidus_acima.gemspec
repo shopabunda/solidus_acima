@@ -5,11 +5,10 @@ require_relative 'lib/solidus_acima/version'
 Gem::Specification.new do |spec|
   spec.name = 'solidus_acima'
   spec.version = SolidusAcima::VERSION
-  spec.authors = ['Paulo DAlberti']
-  spec.email = 'phdalberti@gmail.com'
+  spec.authors = ["Paulo D'Alberti"]
+  spec.email = 'contact@solidus.io'
 
-  spec.summary = 'TODO: Write a short summary, because RubyGems requires one.'
-  spec.description = 'TODO: Write a longer description or delete this line.'
+  spec.summary = 'Solidus extension for using Acima in your store'
   spec.homepage = 'https://github.com/solidusio-contrib/solidus_acima#readme'
   spec.license = 'BSD-3-Clause'
 
