@@ -11,6 +11,10 @@ module SolidusAcima
 
     engine_name 'solidus_acima'
 
+    initializer "solidus_acima.add_static_preference", after: "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << SolidusAcima::PaymentMethod
+    end
+
     # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
