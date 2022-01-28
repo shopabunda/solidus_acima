@@ -2,17 +2,21 @@
 
 module SolidusAcima
   module CheckoutHelper
+    def cents(float)
+      (float * 100).to_i
+    end
+
     def order_for_acima_transaction(order)
       {
         id: order.number,
-        discounts: order.adjustment_total,
-        shipping: order.shipment_total,
-        salesTax: order.additional_tax_total,
+        discounts: cents(order.adjustment_total),
+        shipping: cents(order.shipment_total),
+        salesTax: cents(order.additional_tax_total),
         lineItems: order.line_items.map do |line_item|
           {
             productId: line_item.sku,
             productName: line_item.name,
-            unitPrice: line_item.price,
+            unitPrice: cents(line_item.price),
             quantity: line_item.quantity
           }
         end
