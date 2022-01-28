@@ -1,7 +1,34 @@
+<%
+    def cents(float)
+      (float * 100).to_i
+    end
+
+    def order_for_acima_transaction(order)
+      {
+        id: order.number,
+        discounts: cents(order.adjustment_total),
+        shipping: cents(order.shipment_total),
+        salesTax: cents(order.additional_tax_total),
+        lineItems: order.line_items.map do |line_item|
+          {
+            productId: line_item.sku,
+            productName: line_item.name,
+            unitPrice: cents(line_item.price),
+            quantity: line_item.quantity
+          }
+        end
+      }.to_json
+    end
+ %>
+
 <div
   id="iframe-container"
   data-merchant-id="<%= payment_method.preferred_merchant_id %>"
   data-iframe-url="<%= payment_method.preferred_iframe_url %>"
+  data-transaction="<%= order_for_acima_transaction(@order) %>"
   >
 </div>
+<button id="acima-card-button" type="button">Pay</button>
+<div id="payment-status-container"></div>
+
 <script src="https://ecom.sandbox.acimacredit.com/js/acima.min.js"></script>
