@@ -1,7 +1,10 @@
 <div
-  id="iframe-container"
+  id="iframe-container" class="acima-iframe-hidden"
   data-merchant-id="<%= payment_method.preferred_merchant_id %>"
   data-iframe-url="<%= payment_method.preferred_iframe_url %>"
+  data-transaction="<%= order_for_acima_transaction(@order) %>"
   >
 </div>
+<button id="acima-card-button" type="button">Pay</button>
+<div id="payment-status-container"></div>
 <script src="https://ecom.sandbox.acimacredit.com/js/acima.min.js"></script>

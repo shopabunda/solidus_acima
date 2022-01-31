@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const cardButton = document.getElementById('acima-card-button');
   cardButton.addEventListener('click', async function (event) {
-
+    iframeContainer.classList.remove('acima-iframe-hidden');
     await handlePaymentMethodSubmission(event);
   });
 })
