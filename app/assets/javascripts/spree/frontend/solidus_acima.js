@@ -1,39 +1,39 @@
 // Placeholder manifest file.
 // the installer will append this file to the app vendored assets here: vendor/assets/javascripts/spree/frontend/all.js'
 
-// Call this function to send a payment token, buyer name, and other details
-// to the project server code so that a payment can be created with
-// Payments API
-async function createPayment(acima, transaction) {
+// Call this function to start the Acima iframe process
+// on success send an API call to create a payment
+const createPayment = async (acima, transaction) => {
   const paymentStatusDiv = document.getElementById('payment-status-container');
 
   acima.checkout({
     transaction: transaction
-  }).catch(({ code, message }) => {
-    paymentStatusDiv.innerHTML = "Payment Failed"
-    throw new Error(message);
+  })
+  .then(() => {
+    // call api to create payment
+    displayPaymentResults('SUCCESS')
+  })
+  .catch(() => {
+    displayPaymentResults('FAILURE')
   })
 }
 
 // Helper method for displaying the Payment Status on the screen.
 // status is either SUCCESS or FAILURE;
-function displayPaymentResults(status) {
-  const statusContainer = document.getElementById(
-    'payment-status-container'
-  );
+const displayPaymentResults = (status) => {
+  const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
   } else {
     statusContainer.classList.remove('is-success');
     statusContainer.classList.add('is-failure');
-
   }
 
   statusContainer.style.visibility = 'visible';
 }
 
-function jsonParseReturningNumbers(json) {
+const jsonParseReturningNumbers = (json) => {
   let nJson = JSON.parse(json);
 
   // Iterate thorugh the array
@@ -60,22 +60,15 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
   const transaction = jsonParseReturningNumbers(iframeContainer.dataset.transaction)
 
-  async function handlePaymentMethodSubmission(event, paymentMethod) {
+  const handlePaymentMethodSubmission = async (event) => {
     event.preventDefault();
 
     try {
-      // disable the submit button as we await tokenization and make a
-      // payment request.
-
+      // disable the submit button as we await payment creation
       cardButton.disabled = true;
       const paymentResults = await createPayment(acima, transaction);
-      displayPaymentResults('SUCCESS');
-
-      console.debug('Payment Success', paymentResults);
     } catch (e) {
       cardButton.disabled = false;
-      displayPaymentResults('FAILURE');
-      console.error(e.message);
     }
   }
 
