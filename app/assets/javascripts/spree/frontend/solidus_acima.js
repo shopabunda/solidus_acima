@@ -37,6 +37,7 @@ const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, paymen
 // Call this function to start the Acima iframe process
 // on success send an API call to create a payment and advance to next step
 const createPayment = async (acima, transaction, orderNumber, orderToken, paymentMethodId) => {
+  console.log('checking out')
   acima.checkout({
     transaction: transaction
   })
@@ -46,10 +47,12 @@ const createPayment = async (acima, transaction, orderNumber, orderToken, paymen
     updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId)
     displayPaymentResults('SUCCESS')
     // advanceOrder(advanceCheckoutUrl, orderToken)
+    return 'OK'
   })
   .catch(({ code, message }) => {
     console.log(`error ${code}: ${message}`)
     displayPaymentResults('FAILURE')
+    return message
   })
 }
 
@@ -58,9 +61,13 @@ const createPayment = async (acima, transaction, orderNumber, orderToken, paymen
 const displayPaymentResults = (status) => {
   const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
+    document.getElementById('card-container').remove()
+    document.getElementById('square-card-button').remove()
+    statusContainer.innerHTML = 'Payment Success'
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
   } else {
+    statusContainer.innerHTML = 'Payment Failure'
     statusContainer.classList.remove('is-success');
     statusContainer.classList.add('is-failure');
   }
@@ -97,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const orderToken =      iframeContainer.dataset.orderToken
   const paymentMethodId = iframeContainer.dataset.paymentMethodId
   const transaction =     jsonParseReturningNumbers(iframeContainer.dataset.transaction)
+  const statusContainer = document.getElementById('payment-status-container');
 
   const handlePaymentMethodSubmission = async (event) => {
     event.preventDefault();
@@ -104,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     try {
       // disable the submit button as we await payment creation
       cardButton.disabled = true;
-      const paymentResults = await createPayment(acima, transaction, orderNumber, orderToken, paymentMethodId);
+      await createPayment(acima, transaction, orderNumber, orderToken, paymentMethodId);
     } catch (e) {
       cardButton.disabled = false;
     }
