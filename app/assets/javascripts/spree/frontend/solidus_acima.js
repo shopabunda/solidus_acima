@@ -1,19 +1,6 @@
 // Placeholder manifest file.
 // the installer will append this file to the app vendored assets here: vendor/assets/javascripts/spree/frontend/all.js'
 
-const advanceOrder = async(advanceCheckoutUrl, orderToken) => {
-  await fetch(advanceCheckoutUrl, {
-    method: "PATCH",
-    headers: {
-      'Content-Type': 'application/json',
-      "X-Spree-Order-Token": orderToken
-    },
-    data: {
-      order_token: orderToken
-    }
-  })
-}
-
 const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, paymentMethodId) => {
   await fetch(`/api/checkouts/${orderNumber}`, {
     method: "PATCH",
@@ -37,22 +24,17 @@ const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, paymen
 // Call this function to start the Acima iframe process
 // on success send an API call to create a payment and advance to next step
 const createPayment = async (acima, transaction, orderNumber, orderToken, paymentMethodId) => {
-  console.log('checking out')
   acima.checkout({
     transaction: transaction
   })
   .then(({ leaseId, leaseNumber, checkoutToken }) => {
-    console.log('then')
-    console.log(response)
     updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId)
     displayPaymentResults('SUCCESS')
-    // advanceOrder(advanceCheckoutUrl, orderToken)
-    return 'OK'
+    window.location.href = '/checkout';
   })
   .catch(({ code, message }) => {
     console.log(`error ${code}: ${message}`)
     displayPaymentResults('FAILURE')
-    return message
   })
 }
 
