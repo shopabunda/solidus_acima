@@ -6,20 +6,22 @@ const redirectToNextStep = (orderNumber, frontend) => {
   }
 }
 
-const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, orderToken, paymentMethodId, frontend) => {
+const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend) => {
   await fetch(`/api/checkouts/${orderNumber}`, {
     method: "PATCH",
     headers: {
       'Content-Type': 'application/json',
       "X-Spree-Order-Token": orderToken
     },
-    data: {
+    body: {
       order: {
-        payment_attributes: [{
+        payments_attributes: [{
           payment_method_id: paymentMethodId,
-          lease_id: leaseId,
-          lease_number: leaseNumber,
-          checkout_token: checkoutToken
+          source_attributes: {
+            lease_id: leaseId,
+            lease_number: leaseNumber,
+            checkout_token: checkoutToken
+          }
         }]
       }
     }
@@ -36,7 +38,7 @@ const createPayment = async (acima, transaction, orderNumber, orderToken, paymen
     transaction: transaction
   })
   .then(({ leaseId, leaseNumber, checkoutToken }) => {
-    updateOrder(orderNumber, orderToken, leaseId, leaseNumber, orderToken, checkoutToken, paymentMethodId, frontend);
+    updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend);
     displayPaymentResults('SUCCESS');
   })
   .catch(({ code, message }) => {
@@ -50,8 +52,8 @@ const createPayment = async (acima, transaction, orderNumber, orderToken, paymen
 const displayPaymentResults = (status) => {
   const statusContainer = document.getElementById('payment-status-container');
   if (status === 'SUCCESS') {
-    document.getElementById('card-container').remove()
-    document.getElementById('square-card-button').remove()
+    document.getElementById('iframe-container').remove()
+    document.getElementById('acima-card-button').remove()
     statusContainer.innerHTML = 'Payment Success'
     statusContainer.classList.remove('is-failure');
     statusContainer.classList.add('is-success');
