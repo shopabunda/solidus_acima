@@ -1,30 +1,31 @@
 const redirectToNextStep = (orderNumber, frontend) => {
   if (frontend) {
-    window.location.href = '/checkout';
+    window.location.href = '/checkout/confirm';
   } else {
     window.location.href = `/admin/orders/${orderNumber}/payments`
   }
 }
 
 const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend) => {
+console.log([leaseId, leaseNumber, checkoutToken])
   await fetch(`/api/checkouts/${orderNumber}`, {
     method: "PATCH",
     headers: {
       'Content-Type': 'application/json',
-      "X-Spree-Order-Token": orderToken
+      'X-Spree-Order-Token': orderToken
     },
-    body: {
-      order: {
-        payments_attributes: [{
-          payment_method_id: paymentMethodId,
-          source_attributes: {
-            lease_id: leaseId,
-            lease_number: leaseNumber,
-            checkout_token: checkoutToken
+    body: JSON.stringify({
+      'order': {
+        'payments_attributes': [{
+          'payment_method_id': paymentMethodId,
+          'source_attributes': {
+            'lease_id': leaseId,
+            'lease_number': leaseNumber,
+            'checkout_token': checkoutToken
           }
         }]
       }
-    }
+    })
   })
   .then(() => {
     redirectToNextStep(orderNumber, frontend)
