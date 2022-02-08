@@ -3,6 +3,7 @@ class CreateSolidusAcimaPaymentSources < ActiveRecord::Migration[6.1]
     create_table :solidus_acima_payment_sources do |t|
       t.string :merchant_id
       t.string :iframe_url
+      t.string :api_key
       t.integer :payment_method_id, index: true
       t.timestamps
     end

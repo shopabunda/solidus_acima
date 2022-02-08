@@ -4,6 +4,7 @@ module SolidusAcima
   class PaymentMethod < SolidusSupport.payment_method_parent_class
     preference :merchant_id, :string
     preference :iframe_url, :string
+    preference :api_key, :string
 
     def gateway_class
       ::SolidusAcima::Gateway
