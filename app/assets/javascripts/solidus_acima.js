@@ -104,9 +104,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     try {
       // disable the submit button as we await payment creation
       cardButton.disabled = true;
+      cardButton.style.display = 'none';
       await createPayment(acima, transaction, orderNumber, orderToken, paymentMethodId, frontend);
     } catch (e) {
       cardButton.disabled = false;
+      cardButton.style.display = '';
     }
   }
 
