@@ -2,6 +2,10 @@
 
 module SolidusAcima
   module OrderDecorator
+    def json_acima_transaction
+      acima_transaction.to_json
+    end
+
     def acima_transaction
       {
         id: number,
@@ -16,7 +20,7 @@ module SolidusAcima
             quantity: line_item.quantity
           }
         end
-      }.to_json
+      }
     end
 
     private
