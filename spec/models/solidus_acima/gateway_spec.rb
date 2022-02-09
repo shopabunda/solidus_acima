@@ -2,15 +2,9 @@ require 'spec_helper'
 require 'httparty'
 
 RSpec.describe SolidusAcima::Gateway, type: :model do
-  let(:gateway) do
-    described_class.new({
-      merchant_id: 'merchant_id',
-      iframe_url: 'https://www.iframe.url/',
-      api_key: 'api_key'
-    })
-  end
+  let(:gateway)        { described_class.new({}) }
   let(:payment_source) { create(:acima_payment_source) }
-  let(:payment) { create(:acima_payment) }
+  let(:payment)        { create(:acima_payment) }
 
   describe '#initialize' do
     it 'initializes' do
@@ -29,7 +23,7 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
   describe '#capture' do
     subject(:capture_response) { gateway.capture(nil, payment_source.checkout_token, { originator: payment }) }
 
-    let(:api_response) { double(HTTParty) }
+    let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
 
     before do
       payment.order.update(state: 'complete')
