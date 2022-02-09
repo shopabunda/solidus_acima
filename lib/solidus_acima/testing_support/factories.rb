@@ -13,6 +13,7 @@ FactoryBot.define do
 
   factory :acima_payment_method, class: SolidusAcima::PaymentMethod do
     name               { 'Acima' }
+    preferences        { { iframe_url: 'https://ecom.sandbox.acimacredit.com' } }
     available_to_admin { true }
     available_to_users { true }
   end

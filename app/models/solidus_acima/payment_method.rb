@@ -6,6 +6,10 @@ module SolidusAcima
     preference :iframe_url, :string
     preference :api_key, :string
 
+    validates :preferred_iframe_url,
+      inclusion: { in: %w[https://ecom.sandbox.acimacredit.com https://ecom.acimacredit.com] },
+      allow_blank: true
+
     def gateway_class
       ::SolidusAcima::Gateway
     end

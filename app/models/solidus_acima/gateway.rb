@@ -27,7 +27,7 @@ module SolidusAcima
       order = options[:originator].order
       transaction = order.acima_transaction
 
-      url = "#{iframe_url}merchants/#{merchant_id}/leases/#{source.lease_id}/finalize"
+      url = "#{iframe_url}/merchants/#{merchant_id}/leases/#{source.lease_id}/finalize"
       headers = { "API-Token": api_key }
       body = { checkout_token: checkout_token, transaction: transaction }.to_json
       response = HTTParty.post(url, headers: headers, body: body)
@@ -52,7 +52,7 @@ module SolidusAcima
     def void(checkout_token, options)
       payment_source = options[:originator].source
 
-      url = "#{iframe_url}contracts/#{payment_source.lease_id}/termination"
+      url = "#{iframe_url}/contracts/#{payment_source.lease_id}/termination"
       headers = { "API-Token": api_key }
       response = HTTParty.post(url, headers: headers)
 
