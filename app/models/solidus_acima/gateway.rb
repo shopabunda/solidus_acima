@@ -49,14 +49,22 @@ module SolidusAcima
       end
     end
 
-    def void(*args); end
+    def void(checkout_token, options)
+      payment_source = options[:originator].source
 
-    def purchase(*args); end
+      url = "#{iframe_url}contracts/#{payment_source.lease_id}/termination"
+      headers = { "API-Token": api_key }
+      response = HTTParty.post(url, headers: headers)
 
-    # def generate_signature(to_sign)
-    #   digest = OpenSSL::Digest.new("sha256")
-    #   hmac = OpenSSL::HMAC.digest(digest, secret, to_sign)
-    #   Base64.strict_encode64(hmac)
-    # end
+      raise 'Acima Server Response Error: Did not get correct response code' unless response.success?
+
+      payment_source.update(status: 'REFUNDED')
+      ActiveMerchant::Billing::Response.new(
+        true,
+        'Transaction refunded',
+        response.body.blank? ? {} : JSON.parse(response.body),
+        authorization: checkout_token
+      )
+    end
   end
 end
