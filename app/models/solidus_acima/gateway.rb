@@ -4,7 +4,14 @@ module SolidusAcima
   class Gateway
     def initialize(*args); end
 
-    def authorize(_amount, payment_source, _gateway_options); end
+    def authorize(_amount, payment_source, _options)
+      ActiveMerchant::Billing::Response.new(
+        true,
+        'Transaction approved',
+        payment_source.attributes,
+        authorization: payment_source.checkout_token
+      )
+    end
 
     def capture(*args); end
 
