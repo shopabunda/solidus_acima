@@ -18,11 +18,5 @@ module SolidusAcima
     def void(*args); end
 
     def purchase(*args); end
-
-    def generate_signature(to_sign)
-      digest = OpenSSL::Digest.new("sha256")
-      hmac = OpenSSL::HMAC.digest(digest, secret, to_sign)
-      Base64.strict_encode64(hmac)
-    end
   end
 end
