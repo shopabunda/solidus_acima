@@ -1,3 +1,37 @@
+const redirectToNextStep = (orderNumber, frontend) => {
+  if (frontend) {
+    window.location.href = '/checkout/confirm';
+  } else {
+    window.location.href = `/admin/orders/${orderNumber}/payments`
+  }
+}
+
+const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend) => {
+console.log([leaseId, leaseNumber, checkoutToken])
+  await fetch(`/api/checkouts/${orderNumber}`, {
+    method: "PATCH",
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Spree-Order-Token': orderToken
+    },
+    body: JSON.stringify({
+      'order': {
+        'payments_attributes': [{
+          'payment_method_id': paymentMethodId,
+          'source_attributes': {
+            'lease_id': leaseId,
+            'lease_number': leaseNumber,
+            'checkout_token': checkoutToken
+          }
+        }]
+      }
+    })
+  })
+  .then(() => {
+    redirectToNextStep(orderNumber, frontend)
+  });
+}
+
 // Call this function to start the Acima iframe process
 // on success send an API call to create a payment and advance to next step
 const createPayment = async (acima, transaction, orderNumber, orderToken, paymentMethodId, frontend) => {
@@ -5,7 +39,7 @@ const createPayment = async (acima, transaction, orderNumber, orderToken, paymen
     transaction: transaction
   })
   .then(({ leaseId, leaseNumber, checkoutToken }) => {
-    // updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend);
+    updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend);
     displayPaymentResults('SUCCESS');
   })
   .catch(({ code, message }) => {
