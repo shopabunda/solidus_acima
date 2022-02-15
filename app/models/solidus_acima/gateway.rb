@@ -49,8 +49,10 @@ module SolidusAcima
       end
     end
 
-    def void(*args); end
+    def purchase(amount, checkout_token, options)
+      capture(amount, checkout_token, options)
+    end
 
-    def purchase(*args); end
+    def void(*args); end
   end
 end

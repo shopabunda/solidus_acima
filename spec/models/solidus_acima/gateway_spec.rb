@@ -59,4 +59,44 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
       end
     end
   end
+
+  describe '#purchase' do
+    subject(:purchase_response) { gateway.purchase(nil, payment_source.checkout_token, { originator: payment }) }
+
+    let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
+
+    before do
+      payment.order.update(state: 'complete')
+      payment.update(state: 'pending')
+      allow(HTTParty).to receive(:post).and_return(api_response)
+      allow(api_response).to receive(:body).and_return('')
+    end
+
+    context 'when successful' do
+      before { allow(api_response).to receive(:success?).and_return(true) }
+
+      it 'creates a billing response' do
+        expect(purchase_response.class).to eq(ActiveMerchant::Billing::Response)
+      end
+
+      it 'the response returns true on #success?' do
+        expect(purchase_response.success?).to eq(true)
+      end
+    end
+
+    context 'when failed' do
+      before do
+        allow(api_response).to receive(:success?).and_return(false)
+        allow(api_response).to receive(:code).and_return(415)
+      end
+
+      it 'creates a failed billing response' do
+        expect(purchase_response.class).to eq(ActiveMerchant::Billing::Response)
+      end
+
+      it 'the response returns false on #success?' do
+        expect(purchase_response.success?).to eq(false)
+      end
+    end
+  end
 end
