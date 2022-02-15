@@ -54,7 +54,22 @@ module SolidusAcima
       capture(amount, response_code, options)
     end
 
-    def void(*args); end
+    def void(response_code, options)
+      payment_source = options[:originator].source
+
+      url = "#{api_url}/applications/#{payment_source.lease_id}/cancel"
+      headers = { 'Authorization': "Bearer #{acima_bearer_token}", 'Accept': 'application/vnd.acima-v2+json' }
+      response = HTTParty.post(url, headers: headers)
+
+      raise 'Acima Server Response Error: Did not get correct response code' unless response.success?
+
+      ActiveMerchant::Billing::Response.new(
+        true,
+        'Transaction voided',
+        {},
+        authorization: response_code
+      )
+    end
 
     private
 
