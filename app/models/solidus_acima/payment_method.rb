@@ -4,7 +4,8 @@ module SolidusAcima
   class PaymentMethod < SolidusSupport.payment_method_parent_class
     preference :merchant_id, :string
     preference :iframe_url, :string
-    preference :api_key, :string
+    preference :client_id, :string
+    preference :client_secret, :string
 
     validates :preferred_iframe_url,
       inclusion: { in: %w[https://ecom.sandbox.acimacredit.com https://ecom.acimacredit.com] },
