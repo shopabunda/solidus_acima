@@ -23,7 +23,7 @@ module SolidusAcima
       )
     end
 
-    def capture(_amount, checkout_token, options)
+    def capture(_amount, response_code, options)
       source = options[:originator].source
 
       url = "#{api_url}/contracts/#{source.lease_id}/delivery_confirmation"
@@ -40,7 +40,7 @@ module SolidusAcima
           true,
           'Transaction captured',
           response || {},
-          authorization: checkout_token
+          authorization: response_code
         )
       else
         ActiveMerchant::Billing::Response.new(
@@ -52,8 +52,8 @@ module SolidusAcima
       end
     end
 
-    def purchase(amount, checkout_token, options)
-      capture(amount, checkout_token, options)
+    def purchase(amount, response_code, options)
+      capture(amount, response_code, options)
     end
 
     def void(*args); end
