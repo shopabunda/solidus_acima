@@ -4,11 +4,9 @@ require 'httparty'
 
 module SolidusAcima
   class Gateway
-    attr_reader :merchant_id, :iframe_url, :api_url, :acima_bearer_token
+    attr_reader :api_url, :acima_bearer_token
 
     def initialize(options)
-      @merchant_id = options[:merchant_id]
-      @iframe_url = options[:iframe_url]
       sandbox = options[:iframe_url].include?('sandbox') ? '-sandbox' : ''
       @api_url = "https://api#{sandbox}.acimacredit.com/api"
       @acima_bearer_token = generate_bearer_token(options[:client_id], options[:client_secret])
