@@ -19,9 +19,61 @@ Bundle your dependencies and run the installation generator:
 bin/rails generate solidus_acima:install
 ```
 
+## Basic Setup
+
+### Creating a new Payment Method
+
+Payment methods can accept preferences either directly entered in admin, or from a static source in code.
+For most projects we recommend using a static source, so that sensitive account credentials are not stored in the database.
+
+1. Set static preferences in an initializer
+
+```ruby
+# config/initializers/solidus_acima.rb
+SolidusAcima.configure do |config|
+  config.acima_merchant_id =    ENV['ACIMA_MERCHANT_ID']
+  config.acima_iframe_url =     ENV['ACIMA_IFRAME_URL']
+  config.acima_client_id =      ENV['ACIMA_CLIENT_ID']
+  config.acima_client_secret =  ENV['ACIMA_CLIENT_SECRET']
+  config.acima_payment_method = Spree::PaymentMethod.find(ENV['ACIMA_PAYMENT_METHOD_ID'])
+end
+
+Spree::Config.configure do |config|
+  config.static_model_preferences.add(
+    SolidusAcima::PaymentMethod,
+    'acima_credentials', {
+      merchant_id: SolidusAcima.config.acima_merchant_id,
+      iframe_url: SolidusAcima.config.acima_iframe_url,
+      client_id: SolidusAcima.config.acima_client_id,
+      client_secret: SolidusAcima.config.acima_client_secret
+    }
+  )
+end
+```
+
+2. Visit `/admin/payment_methods/new`
+3. Set `provider` to SolidusAcima::PaymentMethod
+4. Click "Save"
+5. Choose `acima_credentials` from the `Preference Source` select
+6. Click `Update` to save
+
+Alternatively, create a payment method from the Rails console with:
+
+```ruby
+SolidusAcima::PaymentMethod.create(
+  name: "Acima",
+  preference_source: "acima_credentials"
+)
+```
+
+### How to obtain Acima credentials
+
+[Request to join Acima's Partner Program](https://www.acima.com/partner).
+
 ## Usage
 
-<!-- Explain how to use your extension once it's been installed. -->
+The gem adds an iframe at the payment screens, which you can use to pay with Acima.
+When the payment flow in the Acima iframe finishes, you will be automatically redirected to the next step in the checkout process.
 
 ## Development
 
@@ -88,4 +140,4 @@ Please refer to the dedicated [page](https://github.com/solidusio/solidus/wiki/H
 
 ## License
 
-Copyright (c) 2022 [name of extension author], released under the New BSD License.
+Copyright (c) 2022 [Naokimi], released under the New BSD License.
