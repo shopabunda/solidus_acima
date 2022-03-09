@@ -6,14 +6,15 @@ RSpec.describe SolidusAcima::PaymentSource, type: :model do
       'id',
       'merchant_id',
       'iframe_url',
-      'api_key',
       'payment_method_id',
-      'created_at',
-      'updated_at',
       'lease_id',
       'lease_number',
-      'checkout_token'
-    ]
+      'checkout_token',
+      'client_id',
+      'client_secret',
+      'created_at',
+      'updated_at'
+    ].sort
   }
 
   describe 'Check Model Integrity' do
@@ -22,7 +23,7 @@ RSpec.describe SolidusAcima::PaymentSource, type: :model do
     end
 
     it 'has correct attributes' do
-      expect(described_class.new.attributes.keys).to eq column_list
+      expect(described_class.new.attributes.keys.sort).to eq(column_list)
     end
   end
 end
