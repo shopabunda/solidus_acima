@@ -129,5 +129,41 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
         end
       end
     end
+
+    describe '#void' do
+      subject(:void_response) { gateway.void(payment_source.checkout_token, { originator: payment }) }
+
+      let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
+
+      before do
+        payment.order.update(state: 'complete')
+        payment.update(state: 'pending')
+        allow(HTTParty).to receive(:post).and_return(api_response)
+        allow(api_response).to receive(:stringify_keys).and_return('')
+      end
+
+      context 'when successful' do # rubocop:disable RSpec/NestedGroups
+        before { allow(api_response).to receive(:success?).and_return(true) }
+
+        it 'creates a billing response' do
+          expect(void_response.class).to eq(ActiveMerchant::Billing::Response)
+        end
+
+        it 'the response returns true on #success?' do
+          expect(void_response.success?).to eq(true)
+        end
+      end
+
+      context 'when failed' do # rubocop:disable RSpec/NestedGroups
+        before do
+          allow(api_response).to receive(:success?).and_return(false)
+          allow(api_response).to receive(:code).and_return(415)
+        end
+
+        it 'raises an error' do
+          expect { void_response }.to raise_error(RuntimeError, /Acima Server Response Error:/)
+        end
+      end
+    end
   end
 end
