@@ -2,7 +2,7 @@
 
 module SolidusAcima
   class Configuration
-    attr_accessor :acima_merchant_id, :acima_iframe_url, :acima_client_id, :acima_client_secret
+    attr_accessor :acima_merchant_id, :acima_client_id, :acima_client_secret
   end
 
   class << self

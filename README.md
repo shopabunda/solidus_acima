@@ -32,7 +32,6 @@ For most projects we recommend using a static source, so that sensitive account 
 # config/initializers/solidus_acima.rb
 SolidusAcima.configure do |config|
   config.acima_merchant_id =    ENV['ACIMA_MERCHANT_ID']
-  config.acima_iframe_url =     ENV['ACIMA_IFRAME_URL']
   config.acima_client_id =      ENV['ACIMA_CLIENT_ID']
   config.acima_client_secret =  ENV['ACIMA_CLIENT_SECRET']
   config.acima_payment_method = Spree::PaymentMethod.find(ENV['ACIMA_PAYMENT_METHOD_ID'])
@@ -43,7 +42,6 @@ Spree::Config.configure do |config|
     SolidusAcima::PaymentMethod,
     'acima_credentials', {
       merchant_id: SolidusAcima.config.acima_merchant_id,
-      iframe_url: SolidusAcima.config.acima_iframe_url,
       client_id: SolidusAcima.config.acima_client_id,
       client_secret: SolidusAcima.config.acima_client_secret
     }

@@ -5,7 +5,6 @@ RSpec.describe SolidusAcima::PaymentSource, type: :model do
     [
       'id',
       'merchant_id',
-      'iframe_url',
       'payment_method_id',
       'lease_id',
       'lease_number',
