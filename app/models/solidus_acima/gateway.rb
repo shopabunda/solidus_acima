@@ -25,13 +25,8 @@ module SolidusAcima
       source = options[:originator].source
 
       url = "#{api_url}/contracts/#{source.lease_id}/delivery_confirmation"
-      headers = {
-        'Authorization': "Bearer #{acima_bearer_token}",
-        'Accept': 'application/vnd.acima-v2+json',
-        'Content-Type': 'application/json'
-      }
       body = { selected_delivery_date: Time.zone.tomorrow.strftime("%F") }.to_json
-      response = HTTParty.put(url, headers: headers, body: body)
+      response = HTTParty.put(url, headers: v2_headers.merge('Content-Type': 'application/json'), body: body)
 
       if response.success?
         ActiveMerchant::Billing::Response.new(
@@ -58,8 +53,7 @@ module SolidusAcima
       payment_source = options[:originator].source
 
       url = "#{api_url}/applications/#{payment_source.lease_id}/cancel"
-      headers = { 'Authorization': "Bearer #{acima_bearer_token}", 'Accept': 'application/vnd.acima-v2+json' }
-      response = HTTParty.post(url, headers: headers)
+      response = HTTParty.post(url, headers: v2_headers)
 
       raise 'Acima Server Response Error: Did not get correct response code' unless response.success?
 
@@ -67,6 +61,22 @@ module SolidusAcima
         true,
         'Transaction voided',
         {},
+        authorization: response_code
+      )
+    end
+
+    def credit(_amount, response_code, options)
+      payment_source = options[:originator].payment.source
+
+      url = "#{api_url}/contracts/#{payment_source.lease_id}/termination"
+      response = HTTParty.post(url, headers: v2_headers)
+
+      raise 'Acima Server Response Error: Did not get correct response code' unless response.success?
+
+      ActiveMerchant::Billing::Response.new(
+        true,
+        'Transaction credited',
+        response || {},
         authorization: response_code
       )
     end
@@ -88,6 +98,10 @@ module SolidusAcima
       raise "Acima Server Response Error: #{response}" unless response.success?
 
       response['access_token']
+    end
+
+    def v2_headers
+      { 'Authorization': "Bearer #{acima_bearer_token}", 'Accept': 'application/vnd.acima-v2+json' }
     end
   end
 end
