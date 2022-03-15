@@ -3,13 +3,8 @@
 module SolidusAcima
   class PaymentMethod < SolidusSupport.payment_method_parent_class
     preference :merchant_id, :string
-    preference :iframe_url, :string
     preference :client_id, :string
     preference :client_secret, :string
-
-    validates :preferred_iframe_url,
-      inclusion: { in: %w[https://ecom.sandbox.acimacredit.com https://ecom.acimacredit.com] },
-      allow_blank: true
 
     def gateway_class
       ::SolidusAcima::Gateway
@@ -21,6 +16,10 @@ module SolidusAcima
 
     def partial_name
       "acima"
+    end
+
+    def preferred_iframe_url
+      preferred_test_mode ? 'https://ecom.sandbox.acimacredit.com' : 'https://ecom.acimacredit.com'
     end
   end
 end

@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'httparty'
 
 RSpec.describe SolidusAcima::Gateway, type: :model do
-  let(:gateway)        { described_class.new({ iframe_url: 'sandbox' }) }
+  let(:gateway)        { described_class.new({ test_mode: true }) }
   let(:payment_source) { create(:acima_payment_source) }
   let(:payment)        { create(:acima_payment) }
 

@@ -7,7 +7,7 @@ module SolidusAcima
     attr_reader :api_url, :acima_bearer_token
 
     def initialize(options)
-      sandbox = options[:iframe_url].include?('sandbox') ? '-sandbox' : ''
+      sandbox = options[:test_mode] ? '-sandbox' : ''
       @api_url = "https://api#{sandbox}.acimacredit.com/api"
       @acima_bearer_token = generate_bearer_token(options[:client_id], options[:client_secret])
     end
