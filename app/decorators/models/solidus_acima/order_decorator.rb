@@ -23,6 +23,28 @@ module SolidusAcima
       }
     end
 
+    def json_acima_customer
+      acima_customer.to_json
+    end
+
+    def acima_customer
+      address = bill_address
+      {
+        firstName: address.name.split(' ').first,
+        middleName: address.name.split(' ')[1..-2].join(' '),
+        lastName: address.name.split(' ').last,
+        phone: address.phone,
+        email: email,
+        address: {
+          street1: address.address1,
+          street2: address.address2,
+          city: address.city,
+          state: address.state.abbr,
+          zipCode: address.zipcode,
+        }
+      }
+    end
+
     private
 
     def cents(float)
