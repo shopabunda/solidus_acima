@@ -1,12 +1,14 @@
-const redirectToNextStep = (orderNumber, frontend) => {
-  if (frontend) {
+const redirectToNextStep = (orderNumber, frontend, redirectUrl) => {
+  if (redirectUrl) {
+    window.location.href = redirectUrl;
+  } else if (frontend) {
     window.location.href = '/checkout/confirm';
   } else {
     window.location.href = `/admin/orders/${orderNumber}/payments`
   }
 }
 
-const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend) => {
+const updateOrder = async (orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend, redirectUrl) => {
 console.log([leaseId, leaseNumber, checkoutToken])
   await fetch(`/api/checkouts/${orderNumber}`, {
     method: "PATCH",
@@ -28,19 +30,19 @@ console.log([leaseId, leaseNumber, checkoutToken])
     })
   })
   .then(() => {
-    redirectToNextStep(orderNumber, frontend)
+    redirectToNextStep(orderNumber, frontend, redirectUrl)
   });
 }
 
 // Call this function to start the Acima iframe process
 // on success send an API call to create a payment and advance to next step
-const createPayment = async (acima, customer, transaction, orderNumber, orderToken, paymentMethodId, frontend) => {
+const createPayment = async (acima, customer, transaction, orderNumber, orderToken, paymentMethodId, frontend, redirectUrl) => {
   acima.checkout({
     customer: customer,
     transaction: transaction
   })
   .then(({ leaseId, leaseNumber, checkoutToken }) => {
-    updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend);
+    updateOrder(orderNumber, orderToken, leaseId, leaseNumber, checkoutToken, paymentMethodId, frontend, redirectUrl);
     displayPaymentResults('SUCCESS');
   })
   .catch(({ code, message }) => {
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const transaction =     jsonParseReturningNumbers(iframeContainer.dataset.transaction)
   const customer =        JSON.parse(iframeContainer.dataset.customer)
   const frontend =        iframeContainer.dataset.frontend == "true" ? true : false;
+  const redirectUrl =     iframeContainer.dataset.redirectUrl
 
   const handlePaymentMethodSubmission = async (event) => {
     event.preventDefault();
@@ -107,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       // disable the submit button as we await payment creation
       cardButton.disabled = true;
       cardButton.style.display = 'none';
-      await createPayment(acima, customer, transaction, orderNumber, orderToken, paymentMethodId, frontend);
+      await createPayment(acima, customer, transaction, orderNumber, orderToken, paymentMethodId, frontend, redirectUrl);
     } catch (e) {
       cardButton.disabled = false;
       cardButton.style.display = '';

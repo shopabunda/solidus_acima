@@ -73,6 +73,17 @@ SolidusAcima::PaymentMethod.create(
 The gem adds an iframe at the payment screens, which you can use to pay with Acima.
 When the payment flow in the Acima iframe finishes, you will be automatically redirected to the next step in the checkout process.
 
+### Customizing Displayed Payment Method
+
+To customize the display of the payment method in your app create a file `app/views/spree/shared/_acima.html.erb`,
+copy the contents from the file in this repo and apply the changes you want. Be careful in keeping the IDs to maintain functionality.
+
+### Removing Confirm Step in Checkout Process
+
+SolidusAcima automatically redirects to `/checkout/confirm` on a successful payment.
+In case you removed this step in your checkout process you can add a data attribute `data-redirect-url` to the `iframe-container` div
+with the endpoint you want to redirect to.
+
 ## Development
 
 ### Testing the extension
