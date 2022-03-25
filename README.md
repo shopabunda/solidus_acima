@@ -81,8 +81,16 @@ copy the contents from the file in this repo and apply the changes you want. Be 
 ### Removing Confirm Step in Checkout Process
 
 SolidusAcima automatically redirects to `/checkout/confirm` on a successful payment.
-In case you removed this step in your checkout process you can add a data attribute `data-redirect-url` to the `iframe-container` div
-with the endpoint you want to redirect to.
+In case you removed this step in your checkout process you need to add the following data attributes to the `iframe-container` div:
+```
+data-amount="<%= @order.total %>"
+data-no-confirmation="true"
+```
+
+### Custom Redirect URL for Completed Payments
+
+If on a successful payment you'd like to redirect to a different URL than the default one you can add the data attribute
+`data-redirect-url` with the desired URL to the `iframe-container` div.
 
 ## Development
 
