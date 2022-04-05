@@ -5,10 +5,9 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
   let(:gateway)        { described_class.new({ test_mode: true }) }
   let(:payment_source) { create(:acima_payment_source) }
   let(:payment)        { create(:acima_payment) }
+  let(:api_response)   { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
 
   describe '#generate_bearer_token' do
-    let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
-
     before { allow(HTTParty).to receive(:post).and_return(api_response) }
 
     context 'when successful' do
@@ -53,8 +52,6 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
     describe '#capture' do
       subject(:capture_response) { gateway.capture(nil, payment_source.checkout_token, { originator: payment }) }
 
-      let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
-
       before do
         payment.order.update(state: 'complete')
         payment.update(state: 'pending')
@@ -93,8 +90,6 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
     describe '#purchase' do
       subject(:purchase_response) { gateway.purchase(nil, payment_source.checkout_token, { originator: payment }) }
 
-      let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
-
       before do
         payment.order.update(state: 'complete')
         payment.update(state: 'pending')
@@ -132,8 +127,6 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
 
     describe '#void' do
       subject(:void_response) { gateway.void(payment_source.checkout_token, { originator: payment }) }
-
-      let(:api_response) { double(HTTParty) } # rubocop:disable RSpec/VerifiedDoubles
 
       before do
         payment.order.update(state: 'complete')
@@ -199,6 +192,28 @@ RSpec.describe SolidusAcima::Gateway, type: :model do
 
         it 'raises an error' do
           expect { credit_response }.to raise_error(RuntimeError, /Acima Server Response Error:/)
+        end
+      end
+    end
+
+    describe '#acima_payment_captured?' do
+      subject(:acima_response) { gateway.acima_payment_captured?(payment_source.lease_id) }
+
+      before { allow(HTTParty).to receive(:get).and_return(api_response) }
+
+      context 'when succesful' do # rubocop:disable RSpec/NestedGroups
+        before { allow(api_response).to receive(:success?).and_return(true) }
+
+        it 'returns true' do
+          expect(acima_response).to be(true)
+        end
+      end
+
+      context 'when failed' do # rubocop:disable RSpec/NestedGroups
+        before { allow(api_response).to receive(:success?).and_return(false) }
+
+        it 'returns false' do
+          expect(acima_response).to be(false)
         end
       end
     end

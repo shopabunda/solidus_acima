@@ -25,4 +25,17 @@ RSpec.describe SolidusAcima::PaymentSource, type: :model do
       expect(described_class.new.attributes.keys.sort).to eq(column_list)
     end
   end
+
+  describe '#can_credit?' do
+    let(:gateway)        { SolidusAcima::Gateway.new({ test_mode: true }) }
+    let(:payment_source) { create(:acima_payment_source) }
+    let(:payment)        { create(:acima_payment) }
+
+    it 'calls Gateway#acima_payment_captured?' do
+      # rubocop:disable RSpec/MessageChain
+      expect(payment).to receive_message_chain(:payment_method, :gateway, :acima_payment_captured?)
+      # rubocop:enable RSpec/MessageChain
+      described_class.new.can_credit?(payment)
+    end
+  end
 end

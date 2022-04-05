@@ -81,6 +81,13 @@ module SolidusAcima
       )
     end
 
+    def acima_payment_captured?(lease_id)
+      url = "#{api_url}/contracts/#{lease_id}/status"
+      headers = { 'Authorization': "Bearer #{acima_bearer_token}", 'Accept': 'application/vnd.acima-v1+json' }
+      response = HTTParty.get(url, headers: headers)
+      response.success?
+    end
+
     private
 
     def generate_bearer_token(client_id, client_secret)
